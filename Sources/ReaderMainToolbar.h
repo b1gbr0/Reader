@@ -40,6 +40,8 @@
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar printButton:(UIButton *)button;
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar emailButton:(UIButton *)button;
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar markButton:(UIButton *)button;
+- (void)tappedInToolbar:(ReaderMainToolbar *)toolbar acceptButton:(UIButton *)button;
+- (void)tappedInToolbar:(ReaderMainToolbar *)toolbar faxButton:(UIButton *)button;
 
 @end
 

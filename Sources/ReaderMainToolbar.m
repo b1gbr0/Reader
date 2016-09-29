@@ -50,7 +50,7 @@
 
 #define ICON_BUTTON_WIDTH 40.0f
 
-#define TITLE_FONT_SIZE 19.0f
+#define TITLE_FONT_SIZE 16.0f
 #define TITLE_HEIGHT 28.0f
 
 #pragma mark - Properties
@@ -90,13 +90,14 @@
 #if (READER_STANDALONE == FALSE) // Option
 
 		UIFont *doneButtonFont = [UIFont systemFontOfSize:BUTTON_FONT_SIZE];
-		NSString *doneButtonText = NSLocalizedString(@"Done", @"button text");
+		NSString *doneButtonText = NSLocalizedString(@"Close", @"button text");
 		CGSize doneButtonSize = [doneButtonText sizeWithAttributes:@{NSFontAttributeName : doneButtonFont}];
 		CGFloat doneButtonWidth = (ceil(doneButtonSize.width) + TEXT_BUTTON_PADDING);
 
 		UIButton *doneButton = [UIButton buttonWithType:UIButtonTypeCustom];
 		doneButton.frame = CGRectMake(leftButtonX, BUTTON_Y, doneButtonWidth, BUTTON_HEIGHT);
-		[doneButton setTitleColor:[UIColor colorWithWhite:0.0f alpha:1.0f] forState:UIControlStateNormal];
+//		[doneButton setTitleColor:[UIColor colorWithWhite:0.0f alpha:1.0f] forState:UIControlStateNormal];
+        [doneButton setTitleColor:self.tintColor forState:UIControlStateNormal];
 		[doneButton setTitleColor:[UIColor colorWithWhite:1.0f alpha:1.0f] forState:UIControlStateHighlighted];
 		[doneButton setTitle:doneButtonText forState:UIControlStateNormal]; doneButton.titleLabel.font = doneButtonFont;
 		[doneButton addTarget:self action:@selector(doneButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
@@ -155,6 +156,7 @@
 
 #endif // end of READER_BOOKMARKS Option
 
+#if (READER_ENABLE_EMAIL == TRUE) // Option
 		if (document.canEmail == YES) // Document email enabled
 		{
 			if ([MFMailComposeViewController canSendMail] == YES) // Can email
@@ -179,7 +181,9 @@
 				}
 			}
 		}
+#endif
 
+#if (READER_ENABLE_PRINT == TRUE) // Option
 		if ((document.canPrint == YES) && (document.password == nil)) // Document print enabled
 		{
 			Class printInteractionController = NSClassFromString(@"UIPrintInteractionController");
@@ -201,7 +205,9 @@
 				[self addSubview:printButton]; titleWidth -= (iconButtonWidth + buttonSpacing);
 			}
 		}
+#endif
 
+#if (READER_ENABLE_EXPORT == TRUE) // Option
 		if (document.canExport == YES) // Document export enabled
 		{
 			rightButtonX -= (iconButtonWidth + buttonSpacing); // Next position
@@ -218,8 +224,60 @@
 
 			[self addSubview:exportButton]; titleWidth -= (iconButtonWidth + buttonSpacing);
 		}
+#endif
 
-		if (largeDevice == YES) // Show document filename in toolbar
+        if (document.canAccept) {
+            UIFont *acceptButtonFont = [UIFont systemFontOfSize:BUTTON_FONT_SIZE];
+            NSString *acceptButtonText = NSLocalizedString(@"Accept", @"button text");
+            CGSize acceptButtonSize = [acceptButtonText sizeWithAttributes:@{NSFontAttributeName : acceptButtonFont}];
+            CGFloat acceptButtonWidth = (ceil(acceptButtonSize.width) + TEXT_BUTTON_PADDING);
+
+            rightButtonX -= (acceptButtonWidth + buttonSpacing); // Next position
+
+            UIButton *acceptButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            acceptButton.frame = CGRectMake(rightButtonX, BUTTON_Y, acceptButtonWidth, BUTTON_HEIGHT);
+//            [acceptButton setTitleColor:[UIColor colorWithWhite:0.0f alpha:1.0f] forState:UIControlStateNormal];
+            [acceptButton setTitleColor:self.tintColor forState:UIControlStateNormal];
+            [acceptButton setTitleColor:[UIColor colorWithWhite:1.0f alpha:1.0f] forState:UIControlStateHighlighted];
+            [acceptButton setTitle:acceptButtonText forState:UIControlStateNormal];
+            acceptButton.titleLabel.font = acceptButtonFont;
+            [acceptButton addTarget:self action:@selector(acceptButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+            [acceptButton setBackgroundImage:buttonH forState:UIControlStateHighlighted];
+            [acceptButton setBackgroundImage:buttonN forState:UIControlStateNormal];
+            acceptButton.autoresizingMask = UIViewAutoresizingNone;
+            acceptButton.exclusiveTouch = YES;
+
+            [self addSubview:acceptButton];
+
+            titleWidth -= (acceptButtonWidth + buttonSpacing);
+        }
+
+        if (document.canFax) {
+            UIFont *faxButtonFont = [UIFont systemFontOfSize:BUTTON_FONT_SIZE];
+            NSString *faxButtonText = NSLocalizedString(@"Send", @"button text");
+            CGSize faxButtonSize = [faxButtonText sizeWithAttributes:@{NSFontAttributeName : faxButtonFont}];
+            CGFloat faxButtonWidth = (ceil(faxButtonSize.width) + TEXT_BUTTON_PADDING);
+
+            rightButtonX -= (faxButtonWidth + buttonSpacing); // Next position
+
+            UIButton *faxButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            faxButton.frame = CGRectMake(rightButtonX, BUTTON_Y, faxButtonWidth, BUTTON_HEIGHT);
+            [faxButton setTitleColor:self.tintColor forState:UIControlStateNormal];
+            [faxButton setTitleColor:[UIColor colorWithWhite:1.0f alpha:1.0f] forState:UIControlStateHighlighted];
+            [faxButton setTitle:faxButtonText forState:UIControlStateNormal];
+            faxButton.titleLabel.font = faxButtonFont;
+            [faxButton addTarget:self action:@selector(faxButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+            [faxButton setBackgroundImage:buttonH forState:UIControlStateHighlighted];
+            [faxButton setBackgroundImage:buttonN forState:UIControlStateNormal];
+            faxButton.autoresizingMask = UIViewAutoresizingNone;
+            faxButton.exclusiveTouch = YES;
+
+            [self addSubview:faxButton];
+
+            titleWidth -= (faxButtonWidth + buttonSpacing);
+        }
+
+        //if (largeDevice == YES) // Show document filename in toolbar
 		{
 			CGRect titleRect = CGRectMake(titleX, BUTTON_Y, titleWidth, TITLE_HEIGHT);
 
@@ -233,7 +291,7 @@
 			titleLabel.backgroundColor = [UIColor clearColor];
 			titleLabel.adjustsFontSizeToFitWidth = YES;
 			titleLabel.minimumScaleFactor = 0.75f;
-			titleLabel.text = [document.fileName stringByDeletingPathExtension];
+            titleLabel.text = document.title ?: [document.fileName stringByDeletingPathExtension];
 #if (READER_FLAT_UI == FALSE) // Option
 			titleLabel.shadowColor = [UIColor colorWithWhite:0.75f alpha:1.0f];
 			titleLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
@@ -325,7 +383,17 @@
 
 - (void)doneButtonTapped:(UIButton *)button
 {
-	[delegate tappedInToolbar:self doneButton:button];
+    [delegate tappedInToolbar:self doneButton:button];
+}
+
+- (void)faxButtonTapped:(UIButton *)button
+{
+    [delegate tappedInToolbar:self faxButton:button];
+}
+
+- (void)acceptButtonTapped:(UIButton *)button
+{
+    [delegate tappedInToolbar:self acceptButton:button];
 }
 
 - (void)thumbsButtonTapped:(UIButton *)button

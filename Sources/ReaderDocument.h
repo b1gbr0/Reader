@@ -42,6 +42,11 @@
 @property (nonatomic, readonly) BOOL canExport;
 @property (nonatomic, readonly) BOOL canPrint;
 
+@property (nonatomic, assign) BOOL canAccept;
+@property (nonatomic, assign) BOOL canFax;
+
+@property (nonatomic, strong) NSString* title;
+
 + (ReaderDocument *)withDocumentFilePath:(NSString *)filePath password:(NSString *)phrase;
 
 + (ReaderDocument *)unarchiveFromFileName:(NSString *)filePath password:(NSString *)phrase;

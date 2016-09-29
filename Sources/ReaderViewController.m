@@ -845,6 +845,18 @@
 #endif // end of READER_BOOKMARKS Option
 }
 
+-(void)tappedInToolbar:(ReaderMainToolbar *)toolbar acceptButton:(UIButton *)button
+{
+    NSAssert(self.delegate, @"delegate");
+    [self.delegate readerViewControllerAcceptButtonPressed:self];
+}
+
+-(void)tappedInToolbar:(ReaderMainToolbar *)toolbar faxButton:(UIButton *)button
+{
+    NSAssert(self.delegate, @"delegate");
+    [self.delegate readerViewControllerFaxButtonPressed:self];
+}
+
 #pragma mark - MFMailComposeViewControllerDelegate methods
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error

@@ -31,6 +31,9 @@
 
 @protocol ReaderViewControllerDelegate <NSObject>
 
+-(void)readerViewControllerAcceptButtonPressed:(ReaderViewController*)controller;
+-(void)readerViewControllerFaxButtonPressed:(ReaderViewController*)controller;
+
 @optional // Delegate protocols
 
 - (void)dismissReaderViewController:(ReaderViewController *)viewController;
